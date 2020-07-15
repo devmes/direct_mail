@@ -250,7 +250,7 @@ class Dmail extends BaseScriptClass
             $this->doc->form = '<form action="" method="post" name="' . $this->formname . '" enctype="multipart/form-data">';
 
             // Add CSS
-            $this->getPageRenderer()->addCssFile(ExtensionManagementUtility::extPath('direct_mail') . 'Resources/Public/StyleSheets/modules.css',
+            $this->getPageRenderer()->addCssFile('EXT:direct_mail/Resources/Public/StyleSheets/modules.css',
                 'stylesheet', 'all', '', false, false);
 
             // JavaScript
@@ -2129,12 +2129,14 @@ class Dmail extends BaseScriptClass
             if ((int)$lang['uid'] > 0) {
 
                 $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-                    ->getQueryBuilderForTable('pages_language_overlay');
+                    ->getQueryBuilderForTable('pages');
                 $langRow = $queryBuilder
                     ->select('uid')
-                    ->from('pages_language_overlay')
-                    ->add('where', 'pid=' . (int)$pageUid .
-                        ' AND sys_language_uid=' . (int)$lang['uid'])
+                    ->from('pages')
+                    ->where(
+                        $queryBuilder->expr()->eq('l10n_parent', $queryBuilder->createNamedParameter((int)$pageUid)),
+                        $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter((int)$land['uid']))
+                    )
                     ->execute()
                     ->fetchAll();
 
